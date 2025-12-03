@@ -13,7 +13,7 @@ import lombok.Setter;
 public class SensorRequestDto
 {
 
-	private String nombreDispositivo;
+	private String mac;
 	private String estado;	
     private String valor;
     private String tipo;

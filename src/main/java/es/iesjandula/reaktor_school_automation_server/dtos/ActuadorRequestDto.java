@@ -12,7 +12,7 @@ import lombok.Setter;
 public class ActuadorRequestDto
 {
 
-	private String nombreDispositivo;	
+	private String mac;	
 	private String estado;
 
 }

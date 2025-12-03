@@ -11,7 +11,7 @@ import es.iesjandula.reaktor_school_automation_server.models.Accion;
 public interface IAccionRepository extends JpaRepository<Accion, Long>
 {
     @Query("SELECT new es.iesjandula.reaktor_school_automation_server.dtos.AccionResponseDto(" +
-            "a.id, a.resultado, a.actuador.nombreDispositivo, a.orden.id) " +
+            "a.id, a.resultado, a.actuador.mac, a.orden.id) " +
             "FROM Accion a")
      List<AccionResponseDto> buscarAcciones();
 }

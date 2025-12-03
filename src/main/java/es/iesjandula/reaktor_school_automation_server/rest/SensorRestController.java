@@ -27,17 +27,17 @@ public class SensorRestController
     {
         try 
         {
-            if (sensorRequestDto.getNombreDispositivo() == null || sensorRequestDto.getNombreDispositivo().isEmpty()) 
+            if (sensorRequestDto.getMac() == null || sensorRequestDto.getMac().isEmpty()) 
             {
                 log.error(Constants.ERR_SENSOR_NULO_VACIO);
                 throw new SistemaVozException(Constants.ERR_SENSOR_NULO_VACIO, Constants.ERR_SENSOR_CODE);
             }
-            if (this.sensorRepository.existsById(sensorRequestDto.getNombreDispositivo())) {
+            if (this.sensorRepository.existsById(sensorRequestDto.getMac())) {
                 log.error(Constants.ERR_SENSOR_EXISTE);
                 throw new SistemaVozException(Constants.ERR_SENSOR_EXISTE, Constants.ERR_SENSOR_CODE);
             }
             Sensor sensor = new Sensor();
-            sensor.setNombreDispositivo(sensorRequestDto.getNombreDispositivo());
+            sensor.setMac(sensorRequestDto.getMac());
             sensor.setEstado(sensorRequestDto.getEstado());
             sensor.setValorActual(sensorRequestDto.getValor());
             sensor.setTipoMedia(sensorRequestDto.getTipo());
@@ -56,17 +56,17 @@ public class SensorRestController
     {
         return ResponseEntity.ok(this.sensorRepository.buscarSensores());
     }
-    @DeleteMapping(value = "/{nombreDispositivo}")
-    public ResponseEntity<?> eliminarSensor(@PathVariable String nombreDispositivo) 
+    @DeleteMapping(value = "/{mac}")
+    public ResponseEntity<?> eliminarSensor(@PathVariable String mac) 
     {
         try 
         {
-            if (!this.sensorRepository.existsById(nombreDispositivo)) 
+            if (!this.sensorRepository.existsById(mac)) 
             {
                 log.error(Constants.ERR_SENSOR_NO_EXISTE);
                 throw new SistemaVozException(Constants.ERR_SENSOR_CODE, Constants.ERR_SENSOR_NO_EXISTE); 
             }
-            this.sensorRepository.deleteById(nombreDispositivo);
+            this.sensorRepository.deleteById(mac);
             log.info(Constants.ELEMENTO_ELIMINADO);
             return ResponseEntity.ok().body(Constants.ELEMENTO_ELIMINADO);
         } 

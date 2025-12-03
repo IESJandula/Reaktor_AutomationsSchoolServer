@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SensorResponseDto
 {
-    private String nombreDispositivo;
+    private String mac;
     private String estado;
     private String ubicacionNombre;
     private String valorActual;

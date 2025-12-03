@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ActuadorResponseDto
 {
-    private String nombreDispositivo;
+    private String mac;
     private String estado;
     private String ubicacionNombre;
 }

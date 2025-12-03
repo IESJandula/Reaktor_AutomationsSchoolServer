@@ -11,7 +11,7 @@ import es.iesjandula.reaktor_school_automation_server.models.Sensor;
 public interface ISensorRepository extends JpaRepository<Sensor, String>
 {
     @Query("SELECT new es.iesjandula.reaktor_school_automation_server.dtos.SensorResponseDto(" +
-            "s.nombreDispositivo, s.estado, s.ubicacion.nombreUbicacion, s.valorActual, s.tipoMedia) " +
+            "s.mac, s.estado, s.ubicacion.nombreUbicacion, s.valorActual, s.tipoMedia) " +
             "FROM Sensor s")
      List<SensorResponseDto> buscarSensores();
 }

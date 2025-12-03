@@ -24,8 +24,8 @@ import lombok.Setter;
 public abstract class Dispositivo
 {
 	@Id
-    @Column(length = 25)
-	private String nombreDispositivo;
+    @Column
+	private String mac;
 
 	@Column(length = 25)
 	private String estado;

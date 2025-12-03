@@ -11,6 +11,6 @@ import es.iesjandula.reaktor_school_automation_server.models.Actuador;
 public interface IActuadorRepository extends JpaRepository<Actuador, String>
 {
 	@Query("SELECT new es.iesjandula.reaktor_school_automation_server.dtos.ActuadorResponseDto("
-			+ "a.nombreDispositivo, a.estado, a.ubicacion.nombreUbicacion) " + "FROM Actuador a")
+			+ "a.mac, a.estado, a.ubicacion.nombreUbicacion) " + "FROM Actuador a")
 	List<ActuadorResponseDto> buscarActuadores();
 }

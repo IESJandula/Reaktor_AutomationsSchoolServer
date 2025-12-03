@@ -28,7 +28,7 @@ public class Accion
     @Column(length = 50)
     private String resultado;
     @ManyToOne
-    @JoinColumn(name = "actuador_id")
+    @JoinColumn(name = "mac")
     private Actuador actuador;
     @ManyToOne
     @JoinColumn(name = "orden_id")

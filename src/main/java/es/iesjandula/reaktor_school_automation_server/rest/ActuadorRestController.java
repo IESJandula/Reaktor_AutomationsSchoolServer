@@ -26,18 +26,18 @@ public class ActuadorRestController
     {
         try 
         {
-            if (actuadorRequestDto.getNombreDispositivo() == null || actuadorRequestDto.getNombreDispositivo().isEmpty()) 
+            if (actuadorRequestDto.getMac() == null || actuadorRequestDto.getMac().isEmpty()) 
             {
                 log.error(Constants.ERR_ACTUADOR_NULO_VACIO);
                 throw new SistemaVozException(Constants.ERR_ACTUADOR_NULO_VACIO, Constants.ERR_ACTUADOR_CODE);
             }
-            if (this.actuadorRepository.existsById(actuadorRequestDto.getNombreDispositivo())) 
+            if (this.actuadorRepository.existsById(actuadorRequestDto.getMac())) 
             {
                 log.error(Constants.ERR_ACTUADOR_EXISTE);
                 throw new SistemaVozException(Constants.ERR_ACTUADOR_EXISTE, Constants.ERR_ACTUADOR_CODE);
             }
             Actuador actuador = new Actuador();
-            actuador.setNombreDispositivo(actuadorRequestDto.getNombreDispositivo());
+            actuador.setMac(actuadorRequestDto.getMac());
             actuador.setEstado(actuadorRequestDto.getEstado());
             this.actuadorRepository.saveAndFlush(actuador);
             log.info(Constants.ELEMENTO_AGREGADO);
@@ -54,17 +54,17 @@ public class ActuadorRestController
     {
         return ResponseEntity.ok(this.actuadorRepository.buscarActuadores());
     }
-    @DeleteMapping(value = "/{nombreDispositivo}")
-    public ResponseEntity<?> eliminarActuador(@PathVariable String nombreDispositivo) 
+    @DeleteMapping(value = "/{mac}")
+    public ResponseEntity<?> eliminarActuador(@PathVariable String mac) 
     {
         try 
         {
-            if (!this.actuadorRepository.existsById(nombreDispositivo)) 
+            if (!this.actuadorRepository.existsById(mac)) 
             {
                 log.error(Constants.ERR_ACTUADOR_NO_EXISTE);
                 throw new SistemaVozException(Constants.ERR_ACTUADOR_CODE, Constants.ERR_ACTUADOR_NO_EXISTE); 
             }
-            this.actuadorRepository.deleteById(nombreDispositivo);
+            this.actuadorRepository.deleteById(mac);
             log.info(Constants.ELEMENTO_ELIMINADO);
             return ResponseEntity.ok().body(Constants.ELEMENTO_ELIMINADO);
         } 
