@@ -9,12 +9,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SensorBooleanoRequestDto
+public class SensorBooleanoResponseDto
 {
     private String mac;
     private String estado;
     private Boolean valorActual;
+    private Long ultimaActualizacion;
     private String nombreUbicacion;
-	
-	
 }

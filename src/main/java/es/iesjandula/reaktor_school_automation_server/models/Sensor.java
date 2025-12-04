@@ -22,5 +22,5 @@ public abstract class Sensor extends Dispositivo
 
     @Column(nullable = false)
     private Date ultimaAcualizacion;
-
+    
 }

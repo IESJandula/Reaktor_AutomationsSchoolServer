@@ -1,8 +1,213 @@
 package es.iesjandula.reaktor_school_automation_server.rest;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import es.iesjandula.reaktor_school_automation_server.dtos.SensorBooleanoRequestDto;
+import es.iesjandula.reaktor_school_automation_server.dtos.SensorBooleanoResponseDto;
+import es.iesjandula.reaktor_school_automation_server.dtos.SensorNumericoRequestDto;
+import es.iesjandula.reaktor_school_automation_server.dtos.SensorNumericoResponseDto;
+import es.iesjandula.reaktor_school_automation_server.models.SensorBooleano;
+import es.iesjandula.reaktor_school_automation_server.models.SensorNumerico;
+import es.iesjandula.reaktor_school_automation_server.models.Ubicacion;
+import es.iesjandula.reaktor_school_automation_server.repository.ISensorBooleanoRepository;
+import es.iesjandula.reaktor_school_automation_server.repository.ISensorNumericoRpository;
+import es.iesjandula.reaktor_school_automation_server.repository.IUbicacionRepository;
+import es.iesjandula.reaktor_school_automation_server.utils.Constants;
+import es.iesjandula.reaktor_school_automation_server.utils.SistemaVozException;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-@RequestMapping("")
 @RestController
+@RequestMapping("/admin")
 public class AdminRestController
 {
-	
+
+	@Autowired
+	private ISensorBooleanoRepository sensorBooleanoRepo;
+
+	@Autowired
+	private ISensorNumericoRpository sensorNumericoRepo;
+
+	@Autowired
+	private IUbicacionRepository ubicacionRepo;
+
+	@PostMapping(value = "/sensor/booleano", consumes = "application/json")
+	public ResponseEntity<?> crearSensorBooleano(@RequestBody SensorBooleanoRequestDto sensorBooleanoDto)
+	{
+		try
+		{
+			if (sensorBooleanoDto.getMac() == null || sensorBooleanoDto.getMac().isEmpty())
+			{
+				log.error(Constants.ERR_SENSOR_NULO_VACIO);
+				throw new SistemaVozException(Constants.ERR_SENSOR_NULO_VACIO, Constants.ERR_SENSOR_CODE);
+			}
+
+			if (sensorBooleanoRepo.existsById(sensorBooleanoDto.getMac()))
+			{
+				log.error(Constants.ERR_SENSOR_EXISTE);
+				throw new SistemaVozException(Constants.ERR_SENSOR_EXISTE, Constants.ERR_SENSOR_CODE);
+			}
+
+			if (sensorBooleanoDto.getNombreUbicacion() == null || sensorBooleanoDto.getNombreUbicacion().isEmpty())
+			{
+				log.error(Constants.ERR_UBICACION_NULO_VACIO);
+				throw new SistemaVozException(Constants.ERR_UBICACION_NULO_VACIO, Constants.ERR_UBICACION_CODE);
+			}
+
+			Ubicacion ubicacion = ubicacionRepo.findById(sensorBooleanoDto.getNombreUbicacion())
+					.orElseThrow(() -> new SistemaVozException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
+
+			SensorBooleano sensor = new SensorBooleano();
+			sensor.setMac(sensorBooleanoDto.getMac());
+			sensor.setEstado(sensorBooleanoDto.getEstado());
+			sensor.setValorActual(sensorBooleanoDto.getValorActual());
+			sensor.setUltimaAcualizacion(new Date());
+			sensor.setUbicacion(ubicacion);
+
+			sensorBooleanoRepo.saveAndFlush(sensor);
+
+			log.info(Constants.ELEMENTO_AGREGADO);
+
+			return ResponseEntity.ok().build();
+
+		} 
+		catch (SistemaVozException exception)
+		{
+			log.error(exception.getMessage());
+			return ResponseEntity.badRequest().body(exception);
+		}
+	}
+
+	@GetMapping("/sensor/booleano")
+	public ResponseEntity<?> obtenerSensoresBooleanos()
+	{
+		List<SensorBooleanoResponseDto> lista = sensorBooleanoRepo
+				.findAll().stream().map(s -> new SensorBooleanoResponseDto(s.getMac(), 
+						s.getEstado(),
+						s.getValorActual(), 
+						s.getUltimaAcualizacion().getTime(), 
+						s.getUbicacion().getNombreUbicacion())).toList();
+		
+		return ResponseEntity.ok(lista);
+	}
+
+	@DeleteMapping("/sensor/booleano/{mac}")
+	public ResponseEntity<?> eliminarSensorBooleano(@PathVariable String mac)
+	{
+		try
+		{
+			if (!sensorBooleanoRepo.existsById(mac))
+			{
+				log.error(Constants.ERR_SENSOR_NO_EXISTE);
+				throw new SistemaVozException(Constants.ERR_SENSOR_CODE, Constants.ERR_SENSOR_NO_EXISTE);
+			}
+
+			sensorBooleanoRepo.deleteById(mac);
+			log.info(Constants.ELEMENTO_ELIMINADO);
+			return ResponseEntity.ok(Constants.ELEMENTO_ELIMINADO);
+
+		} 
+		catch (SistemaVozException exception)
+		{
+			log.error(exception.getMessage());
+			
+			return ResponseEntity.badRequest().body(exception);
+		}
+	}
+
+	@PostMapping(value = "/sensor/numerico", consumes = "application/json")
+	public ResponseEntity<?> crearSensorNumerico(@RequestBody SensorNumericoRequestDto sensorNumericoDto)
+	{
+		try
+		{
+			if (sensorNumericoDto.getMac() == null || sensorNumericoDto.getMac().isEmpty())
+			{
+				log.error(Constants.ERR_SENSOR_NULO_VACIO);
+				throw new SistemaVozException(Constants.ERR_SENSOR_NULO_VACIO, Constants.ERR_SENSOR_CODE);
+			}
+
+			if (sensorNumericoRepo.existsById(sensorNumericoDto.getMac()))
+			{
+				log.error(Constants.ERR_SENSOR_EXISTE);
+				throw new SistemaVozException(Constants.ERR_SENSOR_EXISTE, Constants.ERR_SENSOR_CODE);
+			}
+
+			if (sensorNumericoDto.getNombreUbicacion() == null || sensorNumericoDto.getNombreUbicacion().isEmpty())
+			{
+				log.error(Constants.ERR_UBICACION_NULO_VACIO);
+				throw new SistemaVozException(Constants.ERR_UBICACION_NULO_VACIO, Constants.ERR_UBICACION_CODE);
+			}
+
+			Ubicacion ubicacion = ubicacionRepo.findById(sensorNumericoDto.getNombreUbicacion())
+					.orElseThrow(() -> new SistemaVozException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
+
+			SensorNumerico sensor = new SensorNumerico();
+			sensor.setMac(sensorNumericoDto.getMac());
+			sensor.setEstado(sensorNumericoDto.getEstado());
+			sensor.setValorActual(sensorNumericoDto.getValorActual());
+			sensor.setUmbralMinimo(sensorNumericoDto.getUmbralMinimo());
+			sensor.setUmbralMaximo(sensorNumericoDto.getUmbralMaximo());
+			sensor.setUltimaAcualizacion(new Date());
+			sensor.setUbicacion(ubicacion);
+
+			sensorNumericoRepo.saveAndFlush(sensor);
+			log.info(Constants.ELEMENTO_AGREGADO);
+
+			return ResponseEntity.ok().build();
+
+		} catch (SistemaVozException e)
+		{
+			log.error(e.getMessage());
+			return ResponseEntity.badRequest().body(e);
+		}
+	}
+
+	@GetMapping("/sensor/numerico")
+	public ResponseEntity<?> obtenerSensoresNumericos()
+	{
+		List<SensorNumericoResponseDto> lista = sensorNumericoRepo.findAll().stream()
+				.map(s -> new SensorNumericoResponseDto(
+						s.getMac(), 
+						s.getEstado(), 
+						s.getValorActual(),
+						s.getUmbralMinimo(), 
+						s.getUmbralMaximo(), 
+						s.getUltimaAcualizacion().getTime(),
+						s.getUbicacion().getNombreUbicacion())).toList();
+		
+		return ResponseEntity.ok(lista);
+	}
+
+	@DeleteMapping("/sensor/numerico/{mac}")
+	public ResponseEntity<?> eliminarSensorNumerico(@PathVariable String mac)
+	{
+		try
+		{
+			if (!sensorNumericoRepo.existsById(mac))
+			{
+				log.error(Constants.ERR_SENSOR_NO_EXISTE);
+				throw new SistemaVozException(Constants.ERR_SENSOR_CODE, Constants.ERR_SENSOR_NO_EXISTE);
+			}
+
+			sensorNumericoRepo.deleteById(mac);
+			log.info(Constants.ELEMENTO_ELIMINADO);
+			return ResponseEntity.ok(Constants.ELEMENTO_ELIMINADO);
+
+		} catch (SistemaVozException exception )
+		{
+			log.error(exception.getMessage());
+			return ResponseEntity.badRequest().body(exception);
+		}
+	}
 }
