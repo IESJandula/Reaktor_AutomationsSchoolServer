@@ -16,7 +16,7 @@ import es.iesjandula.reaktor.automations_school_server.utils.Constants;
 import es.iesjandula.reaktor.automations_school_server.utils.SistemaVozException;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
-@RequestMapping("/api/ubicacion")
+@RequestMapping("/automations_school/ubicacion")
 @RestController
 public class UbicacionRestController
 {

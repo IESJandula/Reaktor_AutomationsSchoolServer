@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "field")
+@Table(name = "sensor_booleano")
 public class SensorBooleano extends Sensor
 {
 	@Column(nullable = false)

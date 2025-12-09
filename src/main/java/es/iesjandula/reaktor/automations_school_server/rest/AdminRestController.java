@@ -50,6 +50,9 @@ public class AdminRestController
 	@Autowired
 	private IActuadorRepository actuadorRepository;
 	
+	@Autowired
+	private IUbicacionRepository ubicacionRepository;
+	
 	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
 	@PostMapping(value = "/sensor/booleano", consumes = "application/json")
 	public ResponseEntity<?> crearSensorBooleano(@RequestBody SensorBooleanoRequestDto sensorBooleanoDto)
@@ -282,5 +285,12 @@ public class AdminRestController
             log.error(exception.getMessage());
             return ResponseEntity.badRequest().body(exception);
         }
+    }
+    
+    @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
+    @GetMapping(value = "/ubicacion")
+    public ResponseEntity<?> obtenerUbicacion() 
+    {
+        return ResponseEntity.ok(this.ubicacionRepository.buscarUbicaciones());
     }
 }
