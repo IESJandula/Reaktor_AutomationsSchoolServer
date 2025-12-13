@@ -10,7 +10,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
+/**
+ * Clase abstracta base que representa un 'Sensor' (dispositivo capaz de medir o enviar datos).
+ * Hereda las propiedades comunes de Dispositivo y añade información de actualización.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,6 +23,9 @@ import lombok.Setter;
 public abstract class Sensor extends Dispositivo
 {
 
+    /** Fecha y hora de la última vez que el sensor envió datos o se actualizó su estado.
+     * No puede ser nula.
+     */
     @Column(nullable = false)
     private Date ultimaActualizacion;
     

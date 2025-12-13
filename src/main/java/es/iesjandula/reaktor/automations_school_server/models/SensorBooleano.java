@@ -8,6 +8,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entidad JPA que representa un 'Sensor Booleano' (solo puede tener dos estados: verdadero o falso).
+ * Hereda las propiedades de la clase abstracta Sensor.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +20,8 @@ import lombok.Setter;
 @Table(name = "sensor_booleano")
 public class SensorBooleano extends Sensor
 {
-	@Column(nullable = false)
-	private Boolean valorActual;
+    /** Valor actual reportado por el sensor (True/False). No puede ser nulo. */
+    @Column(nullable = false)
+    private Boolean valorActual;
 
 }

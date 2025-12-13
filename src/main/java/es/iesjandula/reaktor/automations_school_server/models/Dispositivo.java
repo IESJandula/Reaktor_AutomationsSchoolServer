@@ -13,7 +13,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
+/**
+ * Clase abstracta base que representa cualquier 'Dispositivo' en el sistema.
+ * Es la raíz de la jerarquía de herencia.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,15 +26,22 @@ import lombok.Setter;
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Dispositivo
 {
-	@Id
+    /** Clave primaria (Primary Key) que utiliza la dirección MAC del dispositivo. */
+    @Id
     @Column
-	private String mac;
+    private String mac;
 
-	@Column(length = 25)
-	private String estado;
-	
-	@ManyToOne
-	@JoinColumn(name = "ubicacion_nombre")
-	private Ubicacion ubicacion;
-	
+    /** Estado actual del dispositivo (e.g., 'Encendido', 'Apagado'). */
+    @Column(length = 25)
+    private String estado;
+    
+    /**
+     * Relación Muchos a Uno con la entidad Ubicacion.
+     * Un dispositivo está asociado a UNA ubicación.
+     * Clave foránea: 'ubicacion_nombre'.
+     */
+    @ManyToOne
+    @JoinColumn(name = "ubicacion_nombre")
+    private Ubicacion ubicacion;
+    
 }

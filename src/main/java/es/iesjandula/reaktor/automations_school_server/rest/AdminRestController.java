@@ -31,225 +31,296 @@ import es.iesjandula.reaktor.automations_school_server.utils.Constants;
 import es.iesjandula.reaktor.base.utils.BaseConstants;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+/**
+ * Controlador REST para operaciones de administración (CRUD) de dispositivos (Sensores y Actuadores) y Ubicaciones.
+ * Requiere el rol de ADMINISTRADOR para todos sus endpoints.
+ */
+@Slf4j 
 @RestController
 @RequestMapping("/automations_school/admin")
 public class AdminRestController
 {
 
-	@Autowired
-	private ISensorBooleanoRepository sensorBooleanoRepo;
+    @Autowired
+    private ISensorBooleanoRepository sensorBooleanoRepo;
 
-	@Autowired
-	private ISensorNumericoRpository sensorNumericoRepo;
+    @Autowired
+    private ISensorNumericoRpository sensorNumericoRepo;
 
-	@Autowired
-	private IUbicacionRepository ubicacionRepository;
+    @Autowired
+    private IUbicacionRepository ubicacionRepository;
 
-	@Autowired
-	private IActuadorRepository actuadorRepository;
-	
-	
-	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
-	@PostMapping(value = "/sensor/booleano", consumes = "application/json")
-	public ResponseEntity<?> crearSensorBooleano(@RequestBody SensorBooleanoRequestDto sensorBooleanoDto)
-	{
-		try
-		{
-			if (sensorBooleanoDto.getMac() == null || sensorBooleanoDto.getMac().isEmpty())
-			{
-				log.error(Constants.ERR_SENSOR_NULO_VACIO);
-				throw new AutomationSchoolServerException(Constants.ERR_SENSOR_NULO_VACIO, Constants.ERR_SENSOR_CODE);
-			}
+    @Autowired
+    private IActuadorRepository actuadorRepository;
+    
+    // ----------------------------------------------------------------------------------
+    // --- ENDPOINTS PARA SENSOR BOOLEANO ---
+    // ----------------------------------------------------------------------------------
 
-			if (sensorBooleanoRepo.existsById(sensorBooleanoDto.getMac()))
-			{
-				log.error(Constants.ERR_SENSOR_EXISTE);
-				throw new AutomationSchoolServerException(Constants.ERR_SENSOR_EXISTE, Constants.ERR_SENSOR_CODE);
-			}
+    /**
+     * Endpoint para crear un nuevo Sensor Booleano.
+     * @param sensorBooleanoDto DTO que contiene los datos del nuevo sensor.
+     * @return ResponseEntity con código 200 (OK) o 400 (Bad Request) si falla la validación.
+     */
+    @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')") // Restringe el acceso solo a usuarios con rol ADMINISTRADOR
+    @PostMapping(value = "/sensor/booleano", consumes = "application/json")
+    public ResponseEntity<?> crearSensorBooleano(@RequestBody SensorBooleanoRequestDto sensorBooleanoDto)
+    {
+        try
+        {
+            // Validación: MAC no nula o vacía
+            if (sensorBooleanoDto.getMac() == null || sensorBooleanoDto.getMac().isEmpty())
+            {
+                log.error(Constants.ERR_SENSOR_NULO_VACIO);
+                throw new AutomationSchoolServerException(Constants.ERR_SENSOR_NULO_VACIO, Constants.ERR_SENSOR_CODE);
+            }
 
-			if (sensorBooleanoDto.getNombreUbicacion() == null || sensorBooleanoDto.getNombreUbicacion().isEmpty())
-			{
-				log.error(Constants.ERR_UBICACION_NULO_VACIO);
-				throw new AutomationSchoolServerException(Constants.ERR_UBICACION_NULO_VACIO, Constants.ERR_UBICACION_CODE);
-			}
+            // Validación: El sensor no debe existir previamente
+            if (sensorBooleanoRepo.existsById(sensorBooleanoDto.getMac()))
+            {
+                log.error(Constants.ERR_SENSOR_EXISTE);
+                throw new AutomationSchoolServerException(Constants.ERR_SENSOR_EXISTE, Constants.ERR_SENSOR_CODE);
+            }
 
-			Ubicacion ubicacion = ubicacionRepository.findById(sensorBooleanoDto.getNombreUbicacion())
-					.orElseThrow(() -> new AutomationSchoolServerException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
+            // Validación: Nombre de Ubicación no nulo o vacío
+            if (sensorBooleanoDto.getNombreUbicacion() == null || sensorBooleanoDto.getNombreUbicacion().isEmpty())
+            {
+                log.error(Constants.ERR_UBICACION_NULO_VACIO);
+                throw new AutomationSchoolServerException(Constants.ERR_UBICACION_NULO_VACIO, Constants.ERR_UBICACION_CODE);
+            }
 
-			SensorBooleano sensor = new SensorBooleano();
-			sensor.setMac(sensorBooleanoDto.getMac());
-			sensor.setEstado(sensorBooleanoDto.getEstado());
-			sensor.setUbicacion(ubicacion);
+            // Busca la Ubicación por nombre. Si no existe, lanza excepción.
+            Ubicacion ubicacion = ubicacionRepository.findById(sensorBooleanoDto.getNombreUbicacion())
+                    .orElseThrow(() -> new AutomationSchoolServerException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
 
-			sensorBooleanoRepo.saveAndFlush(sensor);
+            // Mapeo del DTO a la entidad SensorBooleano
+            SensorBooleano sensor = new SensorBooleano();
+            sensor.setMac(sensorBooleanoDto.getMac());
+            sensor.setEstado(sensorBooleanoDto.getEstado());
+            sensor.setUbicacion(ubicacion);
 
-			log.info(Constants.ELEMENTO_AGREGADO);
+            // Guardar el nuevo sensor en la base de datos
+            sensorBooleanoRepo.saveAndFlush(sensor);
 
-			return ResponseEntity.ok().build();
+            log.info(Constants.ELEMENTO_AGREGADO);
 
-		} 
-		catch (AutomationSchoolServerException automationSchoolServerException)
-		{
-			return ResponseEntity.badRequest().body(automationSchoolServerException);
-		}
-		catch (Exception exception) 
-		{
-			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
-			return ResponseEntity.status(500).body(automationSchoolServerException); 
-		}
-		
-	}
-	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
-	@GetMapping("/sensor/booleano")
-	public ResponseEntity<?> obtenerSensoresBooleanos()
-	{
-		
-		try
-		{
-			List<SensorBooleanoResponseDto> lista = sensorBooleanoRepo
-					.findAll().stream().map(s -> new SensorBooleanoResponseDto(s.getMac(), 
-							s.getEstado(),
-							s.getValorActual(), 
-							s.getUltimaActualizacion().getTime(), 
-							s.getUbicacion().getNombreUbicacion())).toList();
-			
-			return ResponseEntity.ok(lista);
-		}	
-		catch (Exception exception) 
-		{
-			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
-			return ResponseEntity.status(500).body(automationSchoolServerException); 
-		}
-	}
-	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
-	@DeleteMapping("/sensor/booleano/{mac}")
-	public ResponseEntity<?> eliminarSensorBooleano(@PathVariable String mac)
-	{
-		try
-		{
-			if (!sensorBooleanoRepo.existsById(mac))
-			{
-				log.error(Constants.ERR_SENSOR_NO_EXISTE);
-				throw new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_SENSOR_NO_EXISTE);
-			}
+            return ResponseEntity.ok().build(); // Devuelve 200 OK
+        } 
+        catch (AutomationSchoolServerException automationSchoolServerException)
+        {
+            // Manejo de errores controlados (lógica de negocio)
+            return ResponseEntity.badRequest().body(automationSchoolServerException); // Devuelve 400 Bad Request
+        }
+        catch (Exception exception) 
+        {
+            // Manejo de errores inesperados del sistema
+            AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
+            return ResponseEntity.status(500).body(automationSchoolServerException); // Devuelve 500 Internal Server Error
+        }
+        
+    }
 
-			sensorBooleanoRepo.deleteById(mac);
-			log.info(Constants.ELEMENTO_ELIMINADO);
-			return ResponseEntity.ok(Constants.ELEMENTO_ELIMINADO);
+    /**
+     * Endpoint para obtener la lista de todos los Sensores Booleanos.
+     * @return ResponseEntity con la lista de SensorBooleanoResponseDto o un código 500 en caso de error.
+     */
+    @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
+    @GetMapping("/sensor/booleano")
+    public ResponseEntity<?> obtenerSensoresBooleanos()
+    {
+        
+        try
+        {
+            // Obtiene todos los sensores, los convierte a DTOs de respuesta y los recoge en una lista.
+            List<SensorBooleanoResponseDto> lista = sensorBooleanoRepo
+                    .findAll().stream().map(s -> new SensorBooleanoResponseDto(s.getMac(), 
+                            s.getEstado(),
+                            s.getValorActual(), 
+                            s.getUltimaActualizacion().getTime(), // Convertir Date a timestamp (long)
+                            s.getUbicacion().getNombreUbicacion())).toList();
+            
+            return ResponseEntity.ok(lista);
+        }   
+        catch (Exception exception) 
+        {
+            // Manejo de errores inesperados
+            AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
+            return ResponseEntity.status(500).body(automationSchoolServerException); 
+        }
+    }
 
-		} 
-		catch (AutomationSchoolServerException automationSchoolServerException)
-		{
-			return ResponseEntity.badRequest().body(automationSchoolServerException);
-		}
-		catch (Exception exception) 
-		{
-			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
-			return ResponseEntity.status(500).body(automationSchoolServerException); 
-		}
-	}
-	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
-	@PostMapping(value = "/sensor/numerico", consumes = "application/json")
-	public ResponseEntity<?> crearSensorNumerico(@RequestBody SensorNumericoRequestDto sensorNumericoDto)
-	{
-		try
-		{
-			if (sensorNumericoDto.getMac() == null || sensorNumericoDto.getMac().isEmpty())
-			{
-				log.error(Constants.ERR_SENSOR_NULO_VACIO);
-				throw new AutomationSchoolServerException(Constants.ERR_SENSOR_NULO_VACIO, Constants.ERR_SENSOR_CODE);
-			}
+    /**
+     * Endpoint para eliminar un Sensor Booleano por su MAC.
+     * @param mac MAC del sensor a eliminar.
+     * @return ResponseEntity con código 200 (OK) o 400 si el sensor no existe.
+     */
+    @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
+    @DeleteMapping("/sensor/booleano/{mac}")
+    public ResponseEntity<?> eliminarSensorBooleano(@PathVariable String mac)
+    {
+        try
+        {
+            // Validación: El sensor debe existir
+            if (!sensorBooleanoRepo.existsById(mac))
+            {
+                log.error(Constants.ERR_SENSOR_NO_EXISTE);
+                throw new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_SENSOR_NO_EXISTE);
+            }
 
-			if (sensorNumericoRepo.existsById(sensorNumericoDto.getMac()))
-			{
-				log.error(Constants.ERR_SENSOR_EXISTE);
-				throw new AutomationSchoolServerException(Constants.ERR_SENSOR_EXISTE, Constants.ERR_SENSOR_CODE);
-			}
+            // Eliminación del sensor
+            sensorBooleanoRepo.deleteById(mac);
+            log.info(Constants.ELEMENTO_ELIMINADO);
+            return ResponseEntity.ok(Constants.ELEMENTO_ELIMINADO);
 
-			if (sensorNumericoDto.getNombreUbicacion() == null || sensorNumericoDto.getNombreUbicacion().isEmpty())
-			{
-				log.error(Constants.ERR_UBICACION_NULO_VACIO);
-				throw new AutomationSchoolServerException(Constants.ERR_UBICACION_NULO_VACIO, Constants.ERR_UBICACION_CODE);
-			}
+        } 
+        catch (AutomationSchoolServerException automationSchoolServerException)
+        {
+            return ResponseEntity.badRequest().body(automationSchoolServerException);
+        }
+        catch (Exception exception) 
+        {
+            AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
+            return ResponseEntity.status(500).body(automationSchoolServerException); 
+        }
+    }
+    
+    // ----------------------------------------------------------------------------------
+    // --- ENDPOINTS PARA SENSOR NUMÉRICO ---
+    // ----------------------------------------------------------------------------------
 
-			Ubicacion ubicacion = ubicacionRepository.findById(sensorNumericoDto.getNombreUbicacion())
-					.orElseThrow(() -> new AutomationSchoolServerException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
+    /**
+     * Endpoint para crear un nuevo Sensor Numérico.
+     * El flujo de validación y creación es similar al Sensor Booleano.
+     * @param sensorNumericoDto DTO con los datos del nuevo sensor.
+     * @return ResponseEntity con código 200 (OK) o 400 si falla la validación.
+     */
+    @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
+    @PostMapping(value = "/sensor/numerico", consumes = "application/json")
+    public ResponseEntity<?> crearSensorNumerico(@RequestBody SensorNumericoRequestDto sensorNumericoDto)
+    {
+        try
+        {
+            // Validaciones (MAC, Existencia, Ubicación)
+            if (sensorNumericoDto.getMac() == null || sensorNumericoDto.getMac().isEmpty())
+            {
+                log.error(Constants.ERR_SENSOR_NULO_VACIO);
+                throw new AutomationSchoolServerException(Constants.ERR_SENSOR_NULO_VACIO, Constants.ERR_SENSOR_CODE);
+            }
 
-			SensorNumerico sensor = new SensorNumerico();
-			sensor.setMac(sensorNumericoDto.getMac());
-			sensor.setEstado(sensorNumericoDto.getEstado());
-			sensor.setValorActual(sensorNumericoDto.getValorActual());
-			sensor.setUmbralMinimo(sensorNumericoDto.getUmbralMinimo());
-			sensor.setUmbralMaximo(sensorNumericoDto.getUmbralMaximo());
-			sensor.setUbicacion(ubicacion);
+            if (sensorNumericoRepo.existsById(sensorNumericoDto.getMac()))
+            {
+                log.error(Constants.ERR_SENSOR_EXISTE);
+                throw new AutomationSchoolServerException(Constants.ERR_SENSOR_EXISTE, Constants.ERR_SENSOR_CODE);
+            }
 
-			sensorNumericoRepo.saveAndFlush(sensor);
-			log.info(Constants.ELEMENTO_AGREGADO);
+            if (sensorNumericoDto.getNombreUbicacion() == null || sensorNumericoDto.getNombreUbicacion().isEmpty())
+            {
+                log.error(Constants.ERR_UBICACION_NULO_VACIO);
+                throw new AutomationSchoolServerException(Constants.ERR_UBICACION_NULO_VACIO, Constants.ERR_UBICACION_CODE);
+            }
 
-			return ResponseEntity.ok().build();
+            // Búsqueda de Ubicación
+            Ubicacion ubicacion = ubicacionRepository.findById(sensorNumericoDto.getNombreUbicacion())
+                    .orElseThrow(() -> new AutomationSchoolServerException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
 
-		} 
-		catch (AutomationSchoolServerException automationSchoolServerException)
-		{
-			return ResponseEntity.badRequest().body(automationSchoolServerException);
-		}
-		catch (Exception exception) 
-		{
-			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
-			return ResponseEntity.status(500).body(automationSchoolServerException); 
-		}
-	}
-	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
-	@GetMapping("/sensor/numerico")
-	public ResponseEntity<?> obtenerSensoresNumericos()
-	{
-		List<SensorNumericoResponseDto> lista = sensorNumericoRepo.findAll().stream()
-				.map(s -> new SensorNumericoResponseDto(
-						s.getMac(), 
-						s.getEstado(), 
-						s.getValorActual(),
-						s.getUmbralMinimo(), 
-						s.getUmbralMaximo(), 
-						s.getUltimaActualizacion().getTime(),
-						s.getUbicacion().getNombreUbicacion())).toList();
-		
-		return ResponseEntity.ok(lista);
-	}
-	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
-	@DeleteMapping("/sensor/numerico/{mac}")
-	public ResponseEntity<?> eliminarSensorNumerico(@PathVariable String mac)
-	{
-		try
-		{
-			if (!sensorNumericoRepo.existsById(mac))
-			{
-				log.error(Constants.ERR_SENSOR_NO_EXISTE);
-				throw new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_SENSOR_NO_EXISTE);
-			}
+            // Mapeo del DTO a la entidad SensorNumerico
+            SensorNumerico sensor = new SensorNumerico();
+            sensor.setMac(sensorNumericoDto.getMac());
+            sensor.setEstado(sensorNumericoDto.getEstado());
+            sensor.setValorActual(sensorNumericoDto.getValorActual());
+            sensor.setUmbralMinimo(sensorNumericoDto.getUmbralMinimo());
+            sensor.setUmbralMaximo(sensorNumericoDto.getUmbralMaximo());
+            sensor.setUbicacion(ubicacion);
 
-			sensorNumericoRepo.deleteById(mac);
-			log.info(Constants.ELEMENTO_ELIMINADO);
-			return ResponseEntity.ok(Constants.ELEMENTO_ELIMINADO);
+            sensorNumericoRepo.saveAndFlush(sensor);
+            log.info(Constants.ELEMENTO_AGREGADO);
 
-		} 
-		catch (AutomationSchoolServerException automationSchoolServerException)
-		{
-			return ResponseEntity.badRequest().body(automationSchoolServerException);
-		}
-		catch (Exception exception) 
-		{
-			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
-			return ResponseEntity.status(500).body(automationSchoolServerException); 
-		}
-	}
-	
-	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
+            return ResponseEntity.ok().build();
+        } 
+        catch (AutomationSchoolServerException automationSchoolServerException)
+        {
+            return ResponseEntity.badRequest().body(automationSchoolServerException);
+        }
+        catch (Exception exception) 
+        {
+            AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
+            return ResponseEntity.status(500).body(automationSchoolServerException); 
+        }
+    }
+
+    /**
+     * Endpoint para obtener la lista de todos los Sensores Numéricos.
+     * @return ResponseEntity con la lista de SensorNumericoResponseDto.
+     */
+    @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
+    @GetMapping("/sensor/numerico")
+    public ResponseEntity<?> obtenerSensoresNumericos()
+    {
+        // Obtiene todos los sensores, los mapea a DTOs de respuesta, incluyendo los umbrales.
+        List<SensorNumericoResponseDto> lista = sensorNumericoRepo.findAll().stream()
+                .map(s -> new SensorNumericoResponseDto(
+                        s.getMac(), 
+                        s.getEstado(), 
+                        s.getValorActual(),
+                        s.getUmbralMinimo(), 
+                        s.getUmbralMaximo(), 
+                        s.getUltimaActualizacion().getTime(), // Convertir Date a timestamp (long)
+                        s.getUbicacion().getNombreUbicacion())).toList();
+        
+        return ResponseEntity.ok(lista);
+    }
+
+    /**
+     * Endpoint para eliminar un Sensor Numérico por su MAC.
+     * @param mac MAC del sensor a eliminar.
+     * @return ResponseEntity con código 200 (OK) o 400 si el sensor no existe.
+     */
+    @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
+    @DeleteMapping("/sensor/numerico/{mac}")
+    public ResponseEntity<?> eliminarSensorNumerico(@PathVariable String mac)
+    {
+        try
+        {
+            // Validación: El sensor debe existir
+            if (!sensorNumericoRepo.existsById(mac))
+            {
+                log.error(Constants.ERR_SENSOR_NO_EXISTE);
+                throw new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_SENSOR_NO_EXISTE);
+            }
+
+            // Eliminación del sensor
+            sensorNumericoRepo.deleteById(mac);
+            log.info(Constants.ELEMENTO_ELIMINADO);
+            return ResponseEntity.ok(Constants.ELEMENTO_ELIMINADO);
+
+        } 
+        catch (AutomationSchoolServerException automationSchoolServerException)
+        {
+            return ResponseEntity.badRequest().body(automationSchoolServerException);
+        }
+        catch (Exception exception) 
+        {
+            AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
+            return ResponseEntity.status(500).body(automationSchoolServerException); 
+        }
+    }
+    
+    // ----------------------------------------------------------------------------------
+    // --- ENDPOINTS PARA ACTUADOR ---
+    // ----------------------------------------------------------------------------------
+
+    /**
+     * Endpoint para crear un nuevo Actuador.
+     * @param actuadorRequestDto DTO que contiene los datos del nuevo actuador.
+     * @return ResponseEntity con código 200 (OK) o 400 si falla la validación.
+     */
+    @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
     @PostMapping(value = "/actuador", consumes = "application/json")
     public ResponseEntity<?> crearActuador(@RequestBody(required = true) ActuadorRequestDto actuadorRequestDto) 
     {
         try 
         {
+            // Validaciones (MAC y Existencia)
             if (actuadorRequestDto.getMac() == null || actuadorRequestDto.getMac().isEmpty()) 
             {
                 log.error(Constants.ERR_ACTUADOR_NULO_VACIO);
@@ -261,83 +332,107 @@ public class AdminRestController
                 throw new AutomationSchoolServerException(Constants.ERR_ACTUADOR_EXISTE, Constants.ERR_ACTUADOR_CODE);
             }
             
+            // Búsqueda de Ubicación
             Ubicacion ubicacion = ubicacionRepository.findById(actuadorRequestDto.getNombreUbicacion())
-					.orElseThrow(() -> new AutomationSchoolServerException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
+                    .orElseThrow(() -> new AutomationSchoolServerException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
             
+            // Mapeo y guardado
             Actuador actuador = new Actuador();
             actuador.setMac(actuadorRequestDto.getMac());
             actuador.setEstado(actuadorRequestDto.getEstado());
             actuador.setUbicacion(ubicacion);
             this.actuadorRepository.saveAndFlush(actuador);
+            
             log.info(Constants.ELEMENTO_AGREGADO);
             return ResponseEntity.ok().build();
         } 
-		catch (AutomationSchoolServerException automationSchoolServerException)
-		{
-			return ResponseEntity.badRequest().body(automationSchoolServerException);
-		}
-		catch (Exception exception) 
-		{
-			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_ACTUADOR_CODE, Constants.ERR_CODE);
-			return ResponseEntity.status(500).body(automationSchoolServerException); 
-		}
+        catch (AutomationSchoolServerException automationSchoolServerException)
+        {
+            return ResponseEntity.badRequest().body(automationSchoolServerException);
+        }
+        catch (Exception exception) 
+        {
+            AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_ACTUADOR_CODE, Constants.ERR_CODE);
+            return ResponseEntity.status(500).body(automationSchoolServerException); 
+        }
     }
     
+    /**
+     * Endpoint para obtener la lista de todos los Actuadores.
+     * @return ResponseEntity con la lista de Actuadores.
+     */
     @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
     @GetMapping(value = "/actuador")
     public ResponseEntity<?> obtenerActuador() 
     {
-    	try
-		{
-    		return ResponseEntity.ok(this.actuadorRepository.buscarActuadores());
-			
-		} 
-		catch (Exception exception) 
-		{
-			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_ACTUADOR_CODE, Constants.ERR_CODE);
-			return ResponseEntity.status(500).body(automationSchoolServerException); 
-		}
+        try
+        {
+            // Asume que el repositorio tiene un método customizado 'buscarActuadores' que devuelve los DTOs correctos.
+            return ResponseEntity.ok(this.actuadorRepository.buscarActuadores());
+            
+        } 
+        catch (Exception exception) 
+        {
+            AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_ACTUADOR_CODE, Constants.ERR_CODE);
+            return ResponseEntity.status(500).body(automationSchoolServerException); 
+        }
     }
     
+    /**
+     * Endpoint para eliminar un Actuador por su MAC.
+     * @param mac MAC del actuador a eliminar.
+     * @return ResponseEntity con código 200 (OK) o 400 si el actuador no existe.
+     */
     @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
     @DeleteMapping(value = "/actuador/{mac}")
     public ResponseEntity<?> eliminarActuador(@PathVariable String mac) 
     {
         try 
         {
+            // Validación: El actuador debe existir
             if (!this.actuadorRepository.existsById(mac)) 
             {
                 log.error(Constants.ERR_ACTUADOR_NO_EXISTE);
                 throw new AutomationSchoolServerException(Constants.ERR_ACTUADOR_CODE, Constants.ERR_ACTUADOR_NO_EXISTE); 
             }
+            // Eliminación
             this.actuadorRepository.deleteById(mac);
             log.info(Constants.ELEMENTO_ELIMINADO);
             return ResponseEntity.ok().body(Constants.ELEMENTO_ELIMINADO);
         } 
-		catch (AutomationSchoolServerException automationSchoolServerException)
-		{
-			return ResponseEntity.badRequest().body(automationSchoolServerException);
-		}
-		catch (Exception exception) 
-		{
-			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_ACTUADOR_CODE, Constants.ERR_CODE);
-			return ResponseEntity.status(500).body(automationSchoolServerException); 
-		}
+        catch (AutomationSchoolServerException automationSchoolServerException)
+        {
+            return ResponseEntity.badRequest().body(automationSchoolServerException);
+        }
+        catch (Exception exception) 
+        {
+            AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_ACTUADOR_CODE, Constants.ERR_CODE);
+            return ResponseEntity.status(500).body(automationSchoolServerException); 
+        }
     }
     
+    // ----------------------------------------------------------------------------------
+    // --- ENDPOINTS PARA UBICACION ---
+    // ----------------------------------------------------------------------------------
+
+    /**
+     * Endpoint para obtener la lista de todas las Ubicaciones.
+     * @return ResponseEntity con la lista de Ubicaciones.
+     */
     @PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
     @GetMapping(value = "/ubicacion")
     public ResponseEntity<?> obtenerUbicacion() 
     {
-    	try
-		{
-    		return ResponseEntity.ok(this.ubicacionRepository.buscarUbicaciones());
-			
-		} 
-		catch (Exception exception) 
-		{
-			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_UBICACION_CODE, Constants.ERR_CODE);
-			return ResponseEntity.status(500).body(automationSchoolServerException); 
-		}
+        try
+        {
+            // Asume que el repositorio tiene un método customizado 'buscarUbicaciones' que devuelve los DTOs correctos.
+            return ResponseEntity.ok(this.ubicacionRepository.buscarUbicaciones());
+            
+        } 
+        catch (Exception exception) 
+        {
+            AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_UBICACION_CODE, Constants.ERR_CODE);
+            return ResponseEntity.status(500).body(automationSchoolServerException); 
+        }
     }
 }

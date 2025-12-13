@@ -12,6 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entidad JPA que representa una 'Ubicacion' (lugar físico) en la base de datos.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,12 +24,17 @@ import lombok.Setter;
 public class Ubicacion
 {
 
-	@Id
+    /** Clave primaria (Primary Key) que utiliza el nombre de la ubicación. */
+    @Id
     @Column
-	private String nombreUbicacion;
+    private String nombreUbicacion;
 
-	@OneToMany(mappedBy = "ubicacion")
-	private List<Dispositivo> dispositivos;
-	
-
+    /**
+     * Relación Uno a Muchos con la clase base Dispositivo.
+     * Mapeado por el campo 'ubicacion' en la clase Dispositivo.
+     * Una Ubicación puede contener MUCHOS dispositivos.
+     */
+    @OneToMany(mappedBy = "ubicacion")
+    private List<Dispositivo> dispositivos;
+    
 }
