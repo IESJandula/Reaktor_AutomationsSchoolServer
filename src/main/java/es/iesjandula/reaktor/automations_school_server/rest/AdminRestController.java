@@ -44,13 +44,11 @@ public class AdminRestController
 	private ISensorNumericoRpository sensorNumericoRepo;
 
 	@Autowired
-	private IUbicacionRepository ubicacionRepo;
+	private IUbicacionRepository ubicacionRepository;
 
 	@Autowired
 	private IActuadorRepository actuadorRepository;
 	
-	@Autowired
-	private IUbicacionRepository ubicacionRepository;
 	
 	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
 	@PostMapping(value = "/sensor/booleano", consumes = "application/json")
@@ -76,13 +74,12 @@ public class AdminRestController
 				throw new AutomationSchoolServerException(Constants.ERR_UBICACION_NULO_VACIO, Constants.ERR_UBICACION_CODE);
 			}
 
-			Ubicacion ubicacion = ubicacionRepo.findById(sensorBooleanoDto.getNombreUbicacion())
+			Ubicacion ubicacion = ubicacionRepository.findById(sensorBooleanoDto.getNombreUbicacion())
 					.orElseThrow(() -> new AutomationSchoolServerException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
 
 			SensorBooleano sensor = new SensorBooleano();
 			sensor.setMac(sensorBooleanoDto.getMac());
 			sensor.setEstado(sensorBooleanoDto.getEstado());
-			sensor.setValorActual(sensorBooleanoDto.getValorActual());
 			sensor.setUbicacion(ubicacion);
 
 			sensorBooleanoRepo.saveAndFlush(sensor);
@@ -176,7 +173,7 @@ public class AdminRestController
 				throw new AutomationSchoolServerException(Constants.ERR_UBICACION_NULO_VACIO, Constants.ERR_UBICACION_CODE);
 			}
 
-			Ubicacion ubicacion = ubicacionRepo.findById(sensorNumericoDto.getNombreUbicacion())
+			Ubicacion ubicacion = ubicacionRepository.findById(sensorNumericoDto.getNombreUbicacion())
 					.orElseThrow(() -> new AutomationSchoolServerException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
 
 			SensorNumerico sensor = new SensorNumerico();
@@ -264,7 +261,7 @@ public class AdminRestController
                 throw new AutomationSchoolServerException(Constants.ERR_ACTUADOR_EXISTE, Constants.ERR_ACTUADOR_CODE);
             }
             
-            Ubicacion ubicacion = ubicacionRepo.findById(actuadorRequestDto.getNombreUbicacion())
+            Ubicacion ubicacion = ubicacionRepository.findById(actuadorRequestDto.getNombreUbicacion())
 					.orElseThrow(() -> new AutomationSchoolServerException(Constants.ERR_UBICACION_NO_EXISTE, Constants.ERR_UBICACION_CODE));
             
             Actuador actuador = new Actuador();

@@ -13,7 +13,6 @@ public class SensorBooleanoRequestDto
 {
     private String mac;
     private String estado;
-    private Boolean valorActual;
     private String nombreUbicacion;
 	
 	
