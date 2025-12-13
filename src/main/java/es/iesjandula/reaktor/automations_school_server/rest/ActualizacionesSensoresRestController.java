@@ -32,7 +32,7 @@ public class ActualizacionesSensoresRestController
 
 	
 	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
-	@PostMapping(value = "/sensor/booleano", consumes = "application/json")
+	@PostMapping(value = "/sensor/booleano")
 	public ResponseEntity<?> actualizarSensorBooleano(@RequestHeader Boolean valorActual, String mac)
 	{
 		try
@@ -66,7 +66,7 @@ public class ActualizacionesSensoresRestController
 		
 	}
 	@PreAuthorize("hasRole('" + BaseConstants.ROLE_ADMINISTRADOR + "')")
-	@PostMapping(value = "/sensor/booleano", consumes = "application/json")
+	@PostMapping(value = "/sensor/numerico")
 	public ResponseEntity<?> actualizarSensorNumerico(@RequestHeader Double valorActual, String mac)
 	{
 		try
