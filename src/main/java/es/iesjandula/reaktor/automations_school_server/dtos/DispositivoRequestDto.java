@@ -10,9 +10,14 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+/**
+ * DTO para recibir datos al crear o actualizar un dispositivo.
+ */
 public class DispositivoRequestDto
 {
-
+    // Dirección MAC del dispositivo
 	private String mac;
+	
+    // Estado del dispositivo (ej. activo/inactivo)
 	private String estado;
 }

@@ -9,8 +9,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * DTO para enviar información de una ubicación.
+ */
 public class UbicacionResponseDto
 {
+    // Nombre de la ubicación
     private String nombreUbicacion;
-    //private List<String> dispositivos;
+    
+    // Lista de dispositivos asociados (opcional)
+    // private List<String> dispositivos;
 }

@@ -9,14 +9,27 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * DTO para recibir datos al crear o actualizar un sensor numérico.
+ */
 public class SensorNumericoRequestDto
 {
+    // Dirección MAC del sensor
     private String mac;
+    
+    // Estado del sensor (ej. activo/inactivo)
     private String estado;
+    
+    // Valor actual del sensor
     private Double valorActual;
+    
+    // Umbral mínimo permitido
     private Double umbralMinimo;
+    
+    // Umbral máximo permitido
     private Double umbralMaximo;
+    
+    // Nombre de la ubicación asociada
     private String nombreUbicacion;
-	
-	
 }
+

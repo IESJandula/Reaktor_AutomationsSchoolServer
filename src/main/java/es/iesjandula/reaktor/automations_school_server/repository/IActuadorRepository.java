@@ -8,8 +8,15 @@ import org.springframework.data.jpa.repository.Query;
 import es.iesjandula.reaktor.automations_school_server.dtos.ActuadorResponseDto;
 import es.iesjandula.reaktor.automations_school_server.models.Actuador;
 
+/**
+ * Repositorio JPA para la entidad Actuador.
+ */
 public interface IActuadorRepository extends JpaRepository<Actuador, String>
 {
+	/**
+	 * Devuelve una lista de actuadores usando un DTO
+	 * con su MAC, estado y ubicación.
+	 */
 	@Query("SELECT new es.iesjandula.reaktor.automations_school_server.dtos.ActuadorResponseDto("
 			+ "a.mac, a.estado, a.ubicacion.nombreUbicacion) " + "FROM Actuador a")
 	List<ActuadorResponseDto> buscarActuadores();

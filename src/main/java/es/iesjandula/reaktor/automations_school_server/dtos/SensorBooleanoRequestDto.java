@@ -9,11 +9,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * DTO para recibir datos al crear o actualizar un sensor booleano.
+ */
 public class SensorBooleanoRequestDto
 {
+    // Dirección MAC del sensor
     private String mac;
+    
+    // Estado del sensor (ej. activado/desactivado)
     private String estado;
+    
+    // Nombre de la ubicación asociada
     private String nombreUbicacion;
-	
-	
 }

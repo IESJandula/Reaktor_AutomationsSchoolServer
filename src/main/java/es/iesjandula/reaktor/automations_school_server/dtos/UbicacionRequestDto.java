@@ -10,8 +10,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+/**
+ * DTO para recibir datos al crear o actualizar una ubicación.
+ */
 public class UbicacionRequestDto
 {
-
+    // Nombre de la ubicación
 	private String nombreUbicacion;
 }

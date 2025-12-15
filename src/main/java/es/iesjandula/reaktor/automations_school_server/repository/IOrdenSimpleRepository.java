@@ -7,9 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 
 import es.iesjandula.reaktor.automations_school_server.dtos.OrdenSimpleResponseDto;
 import es.iesjandula.reaktor.automations_school_server.models.OrdenSimple;
-
+/**
+ * Repositorio JPA para la entidad OrdenSimple.
+ */
 public interface IOrdenSimpleRepository extends JpaRepository<OrdenSimple, Long>
 {
+    /**
+     * Devuelve una lista de órdenes simples usando un DTO.
+     */
     @Query("SELECT new es.iesjandula.reaktor.automations_school_server.dtos.OrdenSimpleResponseDto(" +
             "o.id, o.fecha, o.frase) " +
             "FROM OrdenSimple o")

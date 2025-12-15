@@ -9,9 +9,17 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+/**
+ * DTO para recibir datos al crear o actualizar un actuador.
+ */
 public class ActuadorRequestDto
 {
+    // Dirección MAC del actuador
 	private String mac;	
+	
+    // Estado del actuador (ej. encendido/apagado)
 	private String estado;
+	
+    // Nombre de la ubicación asociada
 	private String nombreUbicacion;
 }
