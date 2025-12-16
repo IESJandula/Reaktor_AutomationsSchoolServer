@@ -161,8 +161,7 @@ public class AdminRestController
 		}
 		catch (Exception exception)
 		{
-			AutomationSchoolServerException automationSchoolServerException =
-					new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
+			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
 			log.error("Excepción genérica", automationSchoolServerException);
 			return ResponseEntity.status(500).body(automationSchoolServerException.getBodyExceptionMessage());
 		}
@@ -303,8 +302,7 @@ public class AdminRestController
 		}
 		catch (Exception exception)
 		{
-			AutomationSchoolServerException automationSchoolServerException =
-					new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
+			AutomationSchoolServerException automationSchoolServerException = new AutomationSchoolServerException(Constants.ERR_SENSOR_CODE, Constants.ERR_CODE);
 			log.error("Excepción genérica", automationSchoolServerException);
 			return ResponseEntity.status(500).body(automationSchoolServerException.getBodyExceptionMessage());
 		}

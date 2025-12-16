@@ -13,6 +13,10 @@ import es.iesjandula.reaktor.automations_school_server.models.SensorNumerico;
  */
 public interface ISensorNumericoRpository extends JpaRepository<SensorNumerico, String>
 {
+	/**
+	 * Consulta personalizada definida utilizando JPQL para seleccionar datos específicos y mapearlos
+	 * directamente a objetos DTO mediante su constructor.
+	 */ 
 	@Query("""
 		    SELECT new es.iesjandula.reaktor.automations_school_server.dtos.SensorNumericoResponseDto(
 		        s.mac,

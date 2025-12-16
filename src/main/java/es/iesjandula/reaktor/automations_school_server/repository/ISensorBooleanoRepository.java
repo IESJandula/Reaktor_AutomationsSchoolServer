@@ -13,6 +13,9 @@ import es.iesjandula.reaktor.automations_school_server.models.SensorBooleano;
  */
 public interface ISensorBooleanoRepository extends JpaRepository<SensorBooleano, String>
 {
+	 /* Consulta personalizada definida mediante para recuperar datos específicos.
+	  * Utiliza un constructor de DTO para seleccionar solo los campos necesarios y evitar cargar entidades completas.
+	  */
 	@Query("""
 		    SELECT new es.iesjandula.reaktor.automations_school_server.dtos.SensorBooleanoResponseDto(
 		        s.mac,
