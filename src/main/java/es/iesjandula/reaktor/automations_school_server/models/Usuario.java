@@ -20,8 +20,6 @@ import lombok.Setter;
 @Table(name="usuario")
 public class Usuario 
 {
-	
-	
 	@Id
 	@Column
 	private String email;
@@ -34,10 +32,4 @@ public class Usuario
 	
     @OneToMany(mappedBy = "usuario")
     private List<Orden> ordenes;
-	
-	
-	
-	
-	
-	
 }

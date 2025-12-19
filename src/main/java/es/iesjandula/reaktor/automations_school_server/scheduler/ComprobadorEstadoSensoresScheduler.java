@@ -8,6 +8,6 @@ public class ComprobadorEstadoSensoresScheduler {
 	
 	@Scheduled(fixedRate = 5000)
 	public void test() {
-		System.out.println("hola");
+		//System.out.println("hola");
 	}
 }

@@ -21,7 +21,7 @@ import lombok.Setter;
 public class SensorBooleano extends Sensor
 {
     /** Valor actual reportado por el sensor (True/False). No puede ser nulo. */
-    @Column(nullable = false)
+    @Column
     private Boolean valorActual;
 
 }

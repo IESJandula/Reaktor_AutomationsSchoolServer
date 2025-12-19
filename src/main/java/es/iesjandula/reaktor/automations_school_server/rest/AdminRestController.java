@@ -1,5 +1,6 @@
 package es.iesjandula.reaktor.automations_school_server.rest;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +109,7 @@ public class AdminRestController
 			sensor.setUmbralMaximo(sensorBooleanoDto.getUmbralMaximo());
 			sensor.setUmbralMinimo(sensorBooleanoDto.getUmbralMinimo());
 			sensor.setUbicacion(ubicacion);
+			sensor.setUltimaActualizacion(new Date());
 
 			// Guardar el nuevo sensor en la base de datos
 			sensorBooleanoRepo.saveAndFlush(sensor);
@@ -255,6 +257,8 @@ public class AdminRestController
 			sensor.setUmbralMinimo(sensorNumericoDto.getUmbralMinimo());
 			sensor.setUmbralMaximo(sensorNumericoDto.getUmbralMaximo());
 			sensor.setUbicacion(ubicacion);
+			sensor.setUltimaActualizacion(new Date());
+
 
 			sensorNumericoRepo.saveAndFlush(sensor);
 			log.info(Constants.ELEMENTO_AGREGADO);
