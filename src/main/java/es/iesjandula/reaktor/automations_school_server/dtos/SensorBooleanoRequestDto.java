@@ -22,4 +22,10 @@ public class SensorBooleanoRequestDto
     
     // Nombre de la ubicación asociada
     private String nombreUbicacion;
+    
+    // Valor mínimo permitido o configurado para la alerta del sensor
+    private Double umbralMinimo;
+    
+    // Valor máximo permitido o configurado para la alerta del sensor
+    private Double umbralMaximo;
 }

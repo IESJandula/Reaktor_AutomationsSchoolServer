@@ -29,4 +29,12 @@ public abstract class Sensor extends Dispositivo
     @Column(nullable = false)
     private Date ultimaActualizacion;
     
+    /** Valor mínimo permitido o configurado para la alerta del sensor. */
+    @Column
+    private Double umbralMinimo;
+    
+    /** Valor máximo permitido o configurado para la alerta del sensor. */
+    @Column
+    private Double umbralMaximo;
+    
 }

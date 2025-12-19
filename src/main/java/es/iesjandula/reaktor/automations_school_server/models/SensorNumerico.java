@@ -20,13 +20,6 @@ import lombok.Setter;
 @Table(name="sensor_numerico")
 public class SensorNumerico extends Sensor
 {
-    /** Valor mínimo permitido o configurado para la alerta del sensor. */
-    @Column
-    private Double umbralMinimo;
-    
-    /** Valor máximo permitido o configurado para la alerta del sensor. */
-    @Column
-    private Double umbralMaximo;
     
     /** Valor numérico actual reportado por el sensor. */
     @Column

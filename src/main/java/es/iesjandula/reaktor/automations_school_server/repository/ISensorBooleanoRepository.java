@@ -22,7 +22,9 @@ public interface ISensorBooleanoRepository extends JpaRepository<SensorBooleano,
 		        s.estado,
 		        s.valorActual,
 		        s.ultimaActualizacion,
-		        s.ubicacion.nombreUbicacion
+		        s.ubicacion.nombreUbicacion,
+		        s.umbralMinimo,
+		        s.umbralMaximo
 		    )
 		    FROM SensorBooleano s
 		""")

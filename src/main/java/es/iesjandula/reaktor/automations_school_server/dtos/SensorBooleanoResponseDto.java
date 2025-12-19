@@ -29,13 +29,19 @@ public class SensorBooleanoResponseDto {
 
 	// Nombre de la ubicación asociada
 	private String nombreUbicacion;
+	
+	// Umbral mínimo permitido
+	private Double umbralMinimo;
+
+	// Umbral máximo permitido
+	private Double umbralMaximo;
 				
 	/**
 	 * Constructor para inicializar un objeto de respuesta DTO (Data Transfer Object) para un sensor booleano.
 	 *
 	 */
 	
-	public SensorBooleanoResponseDto(String mac, String estado, Boolean valorActual, Date ultimaActualizacion, String nombreUbicacion) 
+	public SensorBooleanoResponseDto(String mac, String estado, Boolean valorActual, Date ultimaActualizacion, String nombreUbicacion, Double umbralMinimo, Double umbralMaximo  ) 
 	{
 	    // Asigna la dirección MAC proporcionada al campo correspondiente del objeto.
 	    this.mac = mac;
@@ -48,5 +54,9 @@ public class SensorBooleanoResponseDto {
 	    this.ultimaActualizacion = ultimaActualizacion != null ? ultimaActualizacion.getTime() : null;
 	    // Asigna el nombre de la ubicación del sensor.
 	    this.nombreUbicacion = nombreUbicacion;
+		// Umbral mínimo permitido
+		this.umbralMinimo = umbralMinimo;
+		// Umbral máximo permitido
+		this.umbralMaximo = umbralMaximo;
 	}
 }

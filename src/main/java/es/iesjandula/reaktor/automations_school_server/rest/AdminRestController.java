@@ -105,6 +105,8 @@ public class AdminRestController
 			SensorBooleano sensor = new SensorBooleano();
 			sensor.setMac(sensorBooleanoDto.getMac());
 			sensor.setEstado(sensorBooleanoDto.getEstado());
+			sensor.setUmbralMaximo(sensorBooleanoDto.getUmbralMaximo());
+			sensor.setUmbralMinimo(sensorBooleanoDto.getUmbralMinimo());
 			sensor.setUbicacion(ubicacion);
 
 			// Guardar el nuevo sensor en la base de datos
