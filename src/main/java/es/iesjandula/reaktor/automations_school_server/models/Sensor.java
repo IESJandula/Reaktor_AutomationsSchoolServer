@@ -26,7 +26,7 @@ public abstract class Sensor extends Dispositivo
     /** Fecha y hora de la última vez que el sensor envió datos o se actualizó su estado.
      * No puede ser nula.
      */
-    @Column(nullable = false)
+    @Column
     private Date ultimaActualizacion;
     
     /** Valor mínimo permitido o configurado para la alerta del sensor. */
